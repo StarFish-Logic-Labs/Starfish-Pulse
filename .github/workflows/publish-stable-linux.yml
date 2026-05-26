@@ -8,6 +8,7 @@ on:
   push:
     tags:
       - 'v*'
+      - '[0-9]*'
 
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true

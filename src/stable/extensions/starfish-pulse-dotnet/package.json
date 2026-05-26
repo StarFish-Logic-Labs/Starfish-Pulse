@@ -1,0 +1,98 @@
+{
+  "name": "starfish-pulse-dotnet",
+  "displayName": "Starfish Pulse .NET",
+  "description": "VibeCoding AI Assistant specialized for .NET development inside Starfish Pulse",
+  "version": "0.0.1",
+  "publisher": "starfish",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "starfish-pulse-sidebar",
+          "title": "Starfish Pulse",
+          "icon": "media/robot.svg"
+        }
+      ]
+    },
+    "views": {
+      "starfish-pulse-sidebar": [
+        {
+          "type": "webview",
+          "id": "starfish-pulse-chat-view",
+          "name": "Pulse Chat"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "starfish.explainCode",
+        "title": "Starfish Pulse: Explain Selected Code"
+      },
+      {
+        "command": "starfish.generateTests",
+        "title": "Starfish Pulse: Generate Unit Tests (C#)"
+      },
+      {
+        "command": "starfish.fixErrors",
+        "title": "Starfish Pulse: Fix Build/Linter Errors"
+      },
+      {
+        "command": "starfish.resetChat",
+        "title": "Starfish Pulse: Clear Chat History"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "starfish.explainCode",
+          "when": "editorHasSelection",
+          "group": "starfish@1"
+        },
+        {
+          "command": "starfish.generateTests",
+          "when": "editorHasSelection && resourceExtname == .cs",
+          "group": "starfish@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Starfish Pulse",
+      "properties": {
+        "starfish.ollamaUrl": {
+          "type": "string",
+          "default": "http://localhost:11434",
+          "description": "URL of the Ollama server (e.g., http://localhost:11434 or https://ollama.peweez.cloud)"
+        },
+        "starfish.ollamaModel": {
+          "type": "string",
+          "default": "qwen2.5-coder:14b",
+          "description": "Model to use for local generation (e.g. qwen2.5-coder:14b)"
+        },
+        "starfish.n8nWebhookUrl": {
+          "type": "string",
+          "default": "https://n8n.peweez.cloud/webhook/vibe-coding-workflow",
+          "description": "Optional webhook URL for n8n orchestrations"
+        },
+        "starfish.systemPrompt": {
+          "type": "string",
+          "default": "You are Starfish Pulse, a world-class .NET expert AI developed by Jan Jalinski (Founder of Starfish Logic Labs). You help the user write clean, performant, and idiomatic C# and .NET code. Always follow C# 12 / .NET 8 best practices and clean code guidelines.",
+          "description": "System prompt for the chat assistant"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.0.0"
+  }
+}

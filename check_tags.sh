@@ -16,6 +16,26 @@ else
   GITHUB_TOKEN="${GH_TOKEN:-${GITHUB_TOKEN:-${GH_ENTERPRISE_TOKEN:-${GITHUB_ENTERPRISE_TOKEN}}}}"
 fi
 
+if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+  echo "Triggered by tag push. Building release for tag: ${GITHUB_REF_NAME}"
+  export RELEASE_VERSION="${GITHUB_REF_NAME}"
+  export SHOULD_BUILD="yes"
+  
+  QUALITY="${VSCODE_QUALITY:-stable}"
+  if [[ -z "${MS_TAG}" ]]; then
+    MS_TAG=$( jq -r '.tag' "./upstream/${QUALITY}.json" )
+  fi
+  if [[ -z "${MS_COMMIT}" ]]; then
+    MS_COMMIT=$( jq -r '.commit' "./upstream/${QUALITY}.json" )
+  fi
+
+  echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
+  echo "SHOULD_BUILD=${SHOULD_BUILD}" >> "${GITHUB_ENV}"
+  echo "MS_TAG=${MS_TAG}" >> "${GITHUB_ENV}"
+  echo "MS_COMMIT=${MS_COMMIT}" >> "${GITHUB_ENV}"
+  exit 0
+fi
+
 # Support for GitHub Enterprise
 GH_HOST="${GH_HOST:-github.com}"
 

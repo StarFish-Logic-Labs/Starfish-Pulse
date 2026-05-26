@@ -8,6 +8,11 @@ if [[ "${CI_BUILD}" != "no" ]]; then
   git config --global --add safe.directory "/__w/$( echo "${GITHUB_REPOSITORY}" | awk '{print tolower($0)}' )"
 fi
 
+if [[ -z "${RELEASE_VERSION}" ]] && [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+  echo "Using GITHUB_REF_NAME as RELEASE_VERSION: ${GITHUB_REF_NAME}"
+  RELEASE_VERSION="${GITHUB_REF_NAME}"
+fi
+
 if [[ -z "${RELEASE_VERSION}" ]]; then
   if [[ "${VSCODE_LATEST}" == "yes" ]] || [[ ! -f "./upstream/${VSCODE_QUALITY}.json" ]]; then
     echo "Retrieve lastest version"
@@ -35,29 +40,35 @@ if [[ -z "${RELEASE_VERSION}" ]]; then
     RELEASE_VERSION="${MS_TAG}${TIME_PATCH}"
   fi
 else
-  if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-    if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+-insider$ ]];
-    then
-      MS_TAG="${BASH_REMATCH[1]}"
-    else
-      echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
-      exit 1
-    fi
-  else
-    if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+$ ]];
-    then
-      MS_TAG="${BASH_REMATCH[1]}"
-    else
-      echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
-      exit 1
-    fi
-  fi
-
-  if [[ "${MS_TAG}" == "$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )" ]]; then
+  if [[ "${RELEASE_VERSION}" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Custom release version detected: ${RELEASE_VERSION}. Using upstream version from JSON."
+    MS_TAG=$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )
     MS_COMMIT=$( jq -r '.commit' "./upstream/${VSCODE_QUALITY}.json" )
   else
-    echo "Error: No MS_COMMIT for ${RELEASE_VERSION}"
-    exit 1
+    if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
+      if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+-insider$ ]];
+      then
+        MS_TAG="${BASH_REMATCH[1]}"
+      else
+        echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
+        exit 1
+      fi
+    else
+      if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+$ ]];
+      then
+        MS_TAG="${BASH_REMATCH[1]}"
+      else
+        echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
+        exit 1
+      fi
+    fi
+
+    if [[ "${MS_TAG}" == "$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )" ]]; then
+      MS_COMMIT=$( jq -r '.commit' "./upstream/${VSCODE_QUALITY}.json" )
+    else
+      echo "Error: No MS_COMMIT for ${RELEASE_VERSION}"
+      exit 1
+    fi
   fi
 fi
 

@@ -26,7 +26,16 @@ apply_actions() {
           ENTRY_PATH="${ENTRY_PATH%$'\r'}"
 
           if [[ -e "${ENTRY_PATH}" ]]; then
-            if rm -rf -- "${ENTRY_PATH}"; then
+            SUCCESS=false
+            for retry in {1..5}; do
+              if rm -rf -- "${ENTRY_PATH}"; then
+                SUCCESS=true
+                break
+              fi
+              echo "rm -rf failed for ${ENTRY_PATH}, retrying in 1s (attempt ${retry}/5)..." >&2
+              sleep 1
+            done
+            if [[ "${SUCCESS}" == "true" ]]; then
               echo "Removed: ${ENTRY_PATH}"
             else
               echo "Failed to remove: ${ENTRY_PATH}" >&2

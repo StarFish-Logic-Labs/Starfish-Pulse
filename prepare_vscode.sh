@@ -13,7 +13,7 @@ cp -f LICENSE vscode/LICENSE.txt
 
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
-# rm -rf extensions/copilot
+echo '<Project><PropertyGroup><SpectreMitigation>false</SpectreMitigation></PropertyGroup></Project>' > Directory.Build.props
 
 { set +x; } 2>/dev/null
 
@@ -134,6 +134,9 @@ cat product.json
 # include common functions
 . ../utils.sh
 
+replace 's|npmMajor > 11|false|' build/npm/preinstall.ts
+replace 's|npmMajor === 11|false|' build/npm/preinstall.ts
+
 # {{{ apply patches
 
 echo "APP_NAME=\"${APP_NAME}\""
@@ -190,6 +193,8 @@ set -x
 export ELECTRON_SKIP_BINARY_DOWNLOAD=1
 export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 export VSCODE_SKIP_NODE_VERSION_CHECK=1
+export SpectreMitigation=false
+export npm_config_user_agent=""
 
 if [[ "${OS_NAME}" == "linux" ]]; then
    if [[ "${npm_config_arch}" == "arm" ]]; then
@@ -212,9 +217,9 @@ cp ../npmrc .npmrc
 
 for i in {1..5}; do # try 5 times
   if [[ "${CI_BUILD}" != "no" && "${OS_NAME}" == "osx" ]]; then
-    CXX=clang++ npm ci && break
+    CXX=clang++ npm install && break
   else
-    npm ci && break
+    npm install && break
   fi
 
   if [[ $i == 5 ]]; then

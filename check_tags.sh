@@ -9,6 +9,16 @@
 
 set -e
 
+write_env_output() {
+  local key="$1"
+  local val="$2"
+  echo "${key}=${val}" >> "${GITHUB_ENV}"
+  if [[ "${GITHUB_OUTPUT}" ]]; then
+    echo "${key}=${val}" >> "${GITHUB_OUTPUT}"
+  fi
+}
+
+
 if [[ -z "${GH_TOKEN}" ]] && [[ -z "${GITHUB_TOKEN}" ]] && [[ -z "${GH_ENTERPRISE_TOKEN}" ]] && [[ -z "${GITHUB_ENTERPRISE_TOKEN}" ]]; then
   echo "Will not build because no GITHUB_TOKEN defined"
   exit 0
@@ -29,10 +39,10 @@ if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
     MS_COMMIT=$( jq -r '.commit' "./upstream/${QUALITY}.json" )
   fi
 
-  echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
-  echo "SHOULD_BUILD=${SHOULD_BUILD}" >> "${GITHUB_ENV}"
-  echo "MS_TAG=${MS_TAG}" >> "${GITHUB_ENV}"
-  echo "MS_COMMIT=${MS_COMMIT}" >> "${GITHUB_ENV}"
+  write_env_output "RELEASE_VERSION" "${RELEASE_VERSION}"
+  write_env_output "SHOULD_BUILD" "${SHOULD_BUILD}"
+  write_env_output "MS_TAG" "${MS_TAG}"
+  write_env_output "MS_COMMIT" "${MS_COMMIT}"
   exit 0
 fi
 
@@ -68,7 +78,7 @@ else
 
     if [[ "${SHOULD_BUILD}" != "yes" ]]; then
       export RELEASE_VERSION="${LATEST_VERSION}"
-      echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
+      write_env_output "RELEASE_VERSION" "${RELEASE_VERSION}"
 
       echo "Switch to release version: ${RELEASE_VERSION}"
 
@@ -151,19 +161,19 @@ else
 fi
 
 
-echo "SHOULD_BUILD=${SHOULD_BUILD}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_APPIMAGE=${SHOULD_BUILD_APPIMAGE}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_DEB=${SHOULD_BUILD_DEB}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_DMG=${SHOULD_BUILD_DMG}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_EXE_SYS=${SHOULD_BUILD_EXE_SYS}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_EXE_USR=${SHOULD_BUILD_EXE_USR}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_MSI=${SHOULD_BUILD_MSI}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_MSI_NOUP=${SHOULD_BUILD_MSI_NOUP}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_REH=${SHOULD_BUILD_REH}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_REH_WEB=${SHOULD_BUILD_REH_WEB}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_CLI=${SHOULD_BUILD_CLI}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_RPM=${SHOULD_BUILD_RPM}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_SNAP=${SHOULD_BUILD_SNAP}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_TAR=${SHOULD_BUILD_TAR}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_ZIP=${SHOULD_BUILD_ZIP}" >> "${GITHUB_ENV}"
-echo "SHOULD_BUILD_SRC=${SHOULD_BUILD_SRC}" >> "${GITHUB_ENV}"
+write_env_output "SHOULD_BUILD" "${SHOULD_BUILD}"
+write_env_output "SHOULD_BUILD_APPIMAGE" "${SHOULD_BUILD_APPIMAGE}"
+write_env_output "SHOULD_BUILD_DEB" "${SHOULD_BUILD_DEB}"
+write_env_output "SHOULD_BUILD_DMG" "${SHOULD_BUILD_DMG}"
+write_env_output "SHOULD_BUILD_EXE_SYS" "${SHOULD_BUILD_EXE_SYS}"
+write_env_output "SHOULD_BUILD_EXE_USR" "${SHOULD_BUILD_EXE_USR}"
+write_env_output "SHOULD_BUILD_MSI" "${SHOULD_BUILD_MSI}"
+write_env_output "SHOULD_BUILD_MSI_NOUP" "${SHOULD_BUILD_MSI_NOUP}"
+write_env_output "SHOULD_BUILD_REH" "${SHOULD_BUILD_REH}"
+write_env_output "SHOULD_BUILD_REH_WEB" "${SHOULD_BUILD_REH_WEB}"
+write_env_output "SHOULD_BUILD_CLI" "${SHOULD_BUILD_CLI}"
+write_env_output "SHOULD_BUILD_RPM" "${SHOULD_BUILD_RPM}"
+write_env_output "SHOULD_BUILD_SNAP" "${SHOULD_BUILD_SNAP}"
+write_env_output "SHOULD_BUILD_TAR" "${SHOULD_BUILD_TAR}"
+write_env_output "SHOULD_BUILD_ZIP" "${SHOULD_BUILD_ZIP}"
+write_env_output "SHOULD_BUILD_SRC" "${SHOULD_BUILD_SRC}"

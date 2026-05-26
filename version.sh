@@ -16,6 +16,9 @@ if [[ -z "${BUILD_SOURCEVERSION}" ]]; then
     if [[ "${GITHUB_ENV}" ]]; then
         echo "BUILD_SOURCEVERSION=${BUILD_SOURCEVERSION}" >> "${GITHUB_ENV}"
     fi
+    if [[ "${GITHUB_OUTPUT}" ]]; then
+        echo "BUILD_SOURCEVERSION=${BUILD_SOURCEVERSION}" >> "${GITHUB_OUTPUT}"
+    fi
 fi
 
 export BUILD_SOURCEVERSION

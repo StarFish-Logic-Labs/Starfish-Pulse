@@ -27,10 +27,14 @@ env:
   BINARY_NAME: ${{ (github.ref == 'refs/heads/insider' || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'insider')) && 'codium-insiders' || 'codium' }}
   DISABLE_UPDATE: yes
   GH_REPO_PATH: ${{ github.repository }}
-  GITHUB_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.head }}
+  GITHUB_BRANCH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref }}
   ORG_NAME: ${{ github.repository_owner }}
   OS_NAME: linux
   VSCODE_QUALITY: ${{ (github.ref == 'refs/heads/insider' || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'insider')) && 'insider' || 'stable' }}
+  BUILD_SOURCEVERSION: ""
+  MS_COMMIT: ""
+  MS_TAG: ""
+  RELEASE_VERSION: ""
 
 permissions: {}
 
@@ -40,10 +44,10 @@ jobs:
     env:
       VSCODE_ARCH: x64
     outputs:
-      BUILD_SOURCEVERSION: ${{ env.BUILD_SOURCEVERSION }}
-      MS_COMMIT: ${{ env.MS_COMMIT }}
-      MS_TAG: ${{ env.MS_TAG }}
-      RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+      BUILD_SOURCEVERSION: ${{ steps.build.outputs.BUILD_SOURCEVERSION }}
+      MS_COMMIT: ${{ steps.get_repo.outputs.MS_COMMIT }}
+      MS_TAG: ${{ steps.get_repo.outputs.MS_TAG }}
+      RELEASE_VERSION: ${{ steps.get_repo.outputs.RELEASE_VERSION }}
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -76,9 +80,11 @@ jobs:
         run: sudo apt-get update -y && sudo apt-get install -y libkrb5-dev
 
       - name: Clone VSCode repo
+        id: get_repo
         run: ./get_repo.sh
 
       - name: Build
+        id: build
         env:
           SHOULD_BUILD: yes
           SHOULD_BUILD_REH: no
@@ -141,7 +147,7 @@ jobs:
       RELEASE_VERSION: ${{ needs.compile.outputs.RELEASE_VERSION }}
       VSCODE_ARCH: ${{ matrix.vscode_arch }}
     outputs:
-      RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+      RELEASE_VERSION: ${{ needs.compile.outputs.RELEASE_VERSION }}
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

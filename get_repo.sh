@@ -114,6 +114,11 @@ if [[ "${GITHUB_ENV}" ]]; then
   echo "MS_COMMIT=${MS_COMMIT}" >> "${GITHUB_ENV}"
   echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
 fi
+if [[ "${GITHUB_OUTPUT}" ]]; then
+  echo "MS_TAG=${MS_TAG}" >> "${GITHUB_OUTPUT}"
+  echo "MS_COMMIT=${MS_COMMIT}" >> "${GITHUB_OUTPUT}"
+  echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_OUTPUT}"
+fi
 
 export MS_TAG
 export MS_COMMIT

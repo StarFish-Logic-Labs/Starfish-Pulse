@@ -25,16 +25,21 @@ env:
   VSCODE_ARCH: arm64
   VSCODE_LATEST: ${{ github.event.inputs.dont_update == 'true' && 'no' || 'yes' }}
   VSCODE_QUALITY: stable
+  BUILD_SOURCEVERSION: ""
+  MS_COMMIT: ""
+  MS_TAG: ""
+  RELEASE_VERSION: ""
+  SHOULD_BUILD: ""
 
 jobs:
   check:
     runs-on: macos-15
     permissions: {}
     outputs:
-      MS_COMMIT: ${{ env.MS_COMMIT }}
-      MS_TAG: ${{ env.MS_TAG }}
-      RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
-      SHOULD_BUILD: ${{ env.SHOULD_BUILD }}
+      MS_COMMIT: ${{ steps.check_tags.outputs.MS_COMMIT }}
+      MS_TAG: ${{ steps.check_tags.outputs.MS_TAG }}
+      RELEASE_VERSION: ${{ steps.check_tags.outputs.RELEASE_VERSION }}
+      SHOULD_BUILD: ${{ steps.check_tags.outputs.SHOULD_BUILD }}
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -46,6 +51,7 @@ jobs:
         run: . get_repo.sh
 
       - name: Check existing VSCodium tags/releases
+        id: check_tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NEW_RELEASE: ${{ github.event.inputs.new_release }}
@@ -56,7 +62,7 @@ jobs:
     needs:
       - check
     runs-on: macos-15
-    environment: publish-release
+    environment: publish
     permissions:
       contents: write   # Release
     env:

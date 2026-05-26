@@ -98,6 +98,7 @@ transformVersion() {
   local version parts
 
   version="${1%-insider}"
+  version="${version#v}"
 
   IFS='.' read -r -a parts <<< "${version}"
 

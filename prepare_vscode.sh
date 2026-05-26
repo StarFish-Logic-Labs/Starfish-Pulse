@@ -237,7 +237,8 @@ mv .npmrc.bak .npmrc
 # package.json
 cp package.json{,.bak}
 
-setpath "package" "version" "${RELEASE_VERSION%-insider}"
+RELEASE_VERSION_NO_V="${RELEASE_VERSION#v}"
+setpath "package" "version" "${RELEASE_VERSION_NO_V%-insider}"
 
 replace 's|Microsoft Corporation|Starfish Logic Labs|' package.json
 

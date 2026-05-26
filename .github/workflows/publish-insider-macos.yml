@@ -16,6 +16,11 @@ env:
   OS_NAME: osx
   VERSIONS_REPOSITORY: ${{ github.repository_owner }}/versions
   VSCODE_QUALITY: insider
+  BUILD_SOURCEVERSION: ""
+  MS_COMMIT: ""
+  MS_TAG: ""
+  RELEASE_VERSION: ""
+  SHOULD_BUILD: ""
 
 jobs:
   build:
